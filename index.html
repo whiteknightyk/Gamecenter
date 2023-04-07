@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>しろくろこゲームセンター</title>
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.2/css/bootstrap.min.css" integrity="sha512-qtk55TFf1Ozn5/5Y+tB60o5WE5FrXzlPAayJaMvfLLz4w4nv4KQJxMF+GUPaamnAdS+hSfwfMEIlK28akdthA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <style>
+      /* General styles */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+      }
+      
+      .container {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      
+      .card {
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+        transition: transform 0.2s;
+      }
+      
+      .card:hover {
+        transform: translateY(-5px);
+      }
+      
+      /* PC version */
+      @media only screen and (min-width: 768px) {
+        .pc-version {
+          display: block;
+        }
+        
+        .sm-version {
+          display: none;
+        }
+      }
+      
+      /* Smartphone version */
+      @media only screen and (max-width: 767px) {
+        .pc-version {
+          display: none;
+        }
+        
+        .sm-version {
+          display: block;
+        }
+      }
+    </style>
+  </head>
+  
+  <body>
+    <div class="container my-5">
+      <h1 class="text-center mb-5">しろくろこゲームセンター:ChatGPTで作成したゲーム集</h1>
+      
+      <div class="row justify-content-center">
+        <!-- PC version -->
+        <div class="col-lg-5 col-md-8">
+          <div class="card border-primary">
+            <div class="card-body">
+              <h2 class="card-title text-primary mb-4">PCの方はこちらへ</h2>
+              <a href="PC\PC_index.html" class="btn btn-primary">Enter</a>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Smartphone version -->
+        <div class="col-lg-5 col-md-8 mt-4 mt-md-0">
+          <div class="card border-secondary">
+            <div class="card-body">
+              <h2 class="card-title text-secondary mb-4">スマホの方はこちらへ</h2>
+              <a href="SMT\SMT_index.html" class="btn btn-secondary">Enter</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.2/js/bootstrap.bundle.min.js" integrity="sha512-MXc96h2Gdyv7ftgQ2wGtuj0jlYvk8lVh71J+OgH9LpCBtW8dnv7hjw5Zkmq5g5l5Z5ud+V7abkRfSTfh9a1uQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  </body>
+</html>
