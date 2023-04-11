@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=390, initial-scale=1.0"> <!-- iPhone 12の画面幅を指定 -->
+    <title>Four Digits Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            max-width: 100%; /* max-widthを100%に変更 */
+            margin: 0 auto;
+            padding: 1rem; /* 余白を追加 */
+        }
+
+        h1 {
+            font-size: 1.5rem; /* タイトルのフォントサイズを調整 */
+        }
+
+        input {
+            width: 100%; /* inputの幅を100%に変更 */
+            box-sizing: border-box; /* paddingを含めた幅にする */
+            padding: 5px;
+            font-size: 1rem; /* フォントサイズを調整 */
+        }
+
+        button {
+            padding: 5px;
+            font-size: 1rem; /* フォントサイズを調整 */
+        }
+    </style>
+</head>
+<body>
+    <h1>4digitto10</h1>
+    <h1>四則演算で10を作ろう!</h1>
+    <p>※演算子"+-*/"と括弧"()"を使って10を出して下さい。</p>
+    <p id="digits"></p>
+    <p>制限時間: <span id="timer">60</span> 秒</p>
+    <p>点数: <span id="score">0</span> 点</p> <!-- 点数表示を追加 -->
+    <form id="game-form">
+        <input type="text" id="answer" placeholder="式を入力" autocomplete="off">
+        <button type="submit">入力</button>
+    </form>
+    <p id="result"></p>
+    <script src="4digitto10_SMT_process.js"></script>
+</body>
+</html>
