@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4digitto10</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        input {
+            width: 200px;
+            padding: 5px;
+        }
+        
+        button {
+            padding: 5px;
+        }
+	</style>
+</head>
+<body>
+    <h1>4digitto10:四則演算で10を作ろう!</h1>
+    <p>※演算子"+-*/"と括弧"()"を使って10を出して下さい。</p>
+    <p id="digits"></p>
+    <p>制限時間: <span id="timer">60</span> 秒</p>
+    <p>点数: <span id="score">0</span> 点</p> <!-- 点数表示を追加 -->
+    <form id="game-form">
+        <input type="text" id="answer" placeholder="式を入力" autocomplete="off">
+        <button type="submit">入力</button>
+    </form>
+    <p id="result"></p>
+    <script src="4digitto10_PC_process.js"></script>
+</body>
+</html>
