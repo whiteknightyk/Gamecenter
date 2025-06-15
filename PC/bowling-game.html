@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>元気玉ボウリング</title>
+  <style>
+    body { margin: 0; background: #222; color: #fff; font-family: sans-serif; }
+    #gameCanvas { display: block; margin: 0 auto; background: #2a2a2a; }
+    #info { text-align: center; margin-top: 8px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas" width="800" height="1000"></canvas>
+  <div id="info">
+    ゲーム: <span id="gameDisplay">1/1</span> | 
+    フレーム: <span id="frameDisplay">1/10</span> (ロール: <span id="rollDisplay">1/2</span>)<br/>
+    今ゲームのスコア: <span id="scoreDisplay">0</span> | 
+    合計スコア: <span id="totalScoreDisplay">0</span><br/>
+    Aim: <span id="angleDisplay">0°</span> | 
+    Power: <span id="powerDisplay">0</span><br/>
+    Controls: ←/→ Aim  ↑/↓ Power  Space Roll
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx    = canvas.getContext('2d');
+
+    // UI要素
+    const gameEl   = document.getElementById('gameDisplay');
+    const frameEl  = document.getElementById('frameDisplay');
+    const rollEl   = document.getElementById('rollDisplay');
+    const scoreEl  = document.getElementById('scoreDisplay');
+    const totalEl  = document.getElementById('totalScoreDisplay');
+    const angleEl  = document.getElementById('angleDisplay');
+    const powerEl  = document.getElementById('powerDisplay');
+
+    // 定数
+    const BALL_RADIUS   = 150;
+    const PIN_RADIUS    = 10;
+    const FRICTION      = 0.99;
+    const MAX_POWER     = 50;
+    const MIN_POWER     = 5;
+    const TOTAL_GAMES   = 1;
+    const TOTAL_FRAMES  = 10;
+    const MAX_PINS      = 55;
+
+    // ゲーム変数
+    let currentGame   = 1;
+    let frame         = 1;
+    let roll          = 1;
+    let score         = 0;
+    let totalScore    = 0;
+    let gameScores    = [];
+    let firstRollHits = 0;
+    let pendingRollEnd = false;
+
+    let aiming = true;
+    let angle  = -Math.PI / 2; // 真上方向
+    let power  = 10;
+
+    // ボールとピン
+    const ball = { x:0, y:0, vx:0, vy:0 };
+    let pins = [];
+
+    // ピンをセット（逆三角形に並べてます）
+    function setupPins() {
+      pins.length = 0;
+      const rows = [10,9,8,7,6,5,4,3,2,1];
+      const startY = 80;
+      const spacingX = 30, spacingY = 40;
+      rows.forEach((count, ri) => {
+        const totalW = (count - 1) * spacingX;
+        const startX = canvas.width/2 - totalW/2;
+        const y = startY + ri * spacingY;
+        for (let i = 0; i < count; i++) {
+          pins.push({ x: startX + i*spacingX, y, hit: false });
+        }
+      });
+    }
+
+    // フレーム開始処理
+    function startFrame(isNewFrame) {
+      if (isNewFrame) setupPins();
+      // ボールの初期位置
+      ball.x = canvas.width/2;
+      ball.y = canvas.height - 40;
+      ball.vx = ball.vy = 0;
+      aiming = true;
+      // 角度・パワーもリセット可
+      angle = -Math.PI/2;
+      power = 10;
+      updateUI();
+    }
+
+    // ゲーム開始（最初のフレーム）
+    function startGame() {
+      score = 0;
+      gameEl.textContent   = `${currentGame}/${TOTAL_GAMES}`;
+      frame = 1;
+      roll  = 1;
+      scoreEl.textContent  = score;
+      frameEl.textContent  = `${frame}/${TOTAL_FRAMES}`;
+      rollEl.textContent   = `${roll}/2`;
+      startFrame(true);
+    }
+
+    // フレーム終了 or ストライク時の処理
+    function handleRollEnd() {
+      pendingRollEnd = false;
+      // 今までに倒れたピン総数
+      const totalHits = pins.filter(p => p.hit).length;
+
+      if (roll === 1) {
+        firstRollHits = totalHits;
+        if (firstRollHits === MAX_PINS) {
+          // ストライク
+          score += MAX_PINS;
+          scoreEl.textContent = score;
+          nextFrame();
+        } else {
+          // セカンドロールへ
+          roll = 2;
+          rollEl.textContent = `${roll}/2`;
+          // ボールだけ戻して再照準
+          ball.x = canvas.width/2;
+          ball.y = canvas.height - 40;
+          ball.vx = ball.vy = 0;
+          aiming = true;
+        }
+      } else {
+        // セカンドロール終了
+        const framePins = totalHits; // firstRollHits + secondRollHits
+        score += framePins;
+        scoreEl.textContent = score;
+        nextFrame();
+      }
+    }
+
+    // 次フレーム or 次ゲームへ
+    function nextFrame() {
+      frame++;
+      if (frame <= TOTAL_FRAMES) {
+        // 次フレーム
+        frameEl.textContent = `${frame}/${TOTAL_FRAMES}`;
+        roll = 1;
+        rollEl.textContent  = `${roll}/2`;
+        startFrame(true);
+      } else {
+        // ゲーム終了
+        finishGame();
+      }
+    }
+
+    // ゲーム終了後の切り替え
+    function finishGame() {
+      totalScore += score;
+      gameScores.push(score);
+      totalEl.textContent = totalScore;
+      if (currentGame < TOTAL_GAMES) {
+        // 次ゲームへ
+        currentGame++;
+        startGame();
+      } else {
+        // 全3ゲーム終了
+        aiming = false;
+        alert(
+          `全${TOTAL_GAMES}ゲーム終了！\n` +
+          `各ゲームのスコア: ${gameScores.join(' , ')}\n` +
+          `合計スコア: ${totalScore}`
+        );
+      }
+    }
+
+    // キーボード操作
+    function handleKey(e) {
+      if (!aiming) return;
+      switch (e.code) {
+        case 'ArrowLeft':  angle -= 0.05; break;
+        case 'ArrowRight': angle += 0.05; break;
+        case 'ArrowUp':    power = Math.min(power+1, MAX_POWER); break;
+        case 'ArrowDown':  power = Math.max(power-1, MIN_POWER); break;
+        case 'Space':      shoot(); break;
+      }
+    }
+
+    function shoot() {
+      ball.vx = Math.cos(angle) * power;
+      ball.vy = Math.sin(angle) * power;
+      aiming = false;
+    }
+
+    // 更新
+    function update() {
+      if (!aiming && !pendingRollEnd) {
+        ball.x += ball.vx;
+        ball.y += ball.vy;
+        ball.vx *= FRICTION;
+        ball.vy *= FRICTION;
+
+        // ピン判定
+        pins.forEach(pin => {
+          if (!pin.hit) {
+            const dx = ball.x - pin.x, dy = ball.y - pin.y;
+            if (Math.hypot(dx,dy) < BALL_RADIUS + PIN_RADIUS) {
+              pin.hit = true;
+            }
+          }
+        });
+
+        // ボール停止判定
+        if (Math.hypot(ball.vx,ball.vy) < 0.5 ||
+            ball.x < -BALL_RADIUS || ball.x > canvas.width+BALL_RADIUS ||
+            ball.y < -BALL_RADIUS) {
+          pendingRollEnd = true;
+          setTimeout(handleRollEnd, 1000);
+        }
+      }
+    }
+
+    // 軌道予測（点表示）
+    function getTrajectoryPoints() {
+      const pts = [];
+      let sx = ball.x, sy = ball.y;
+      let svx = Math.cos(angle)*power, svy = Math.sin(angle)*power;
+      for (let i = 0; i < 200; i++) {
+        sx += svx; sy += svy;
+        svx *= FRICTION; svy *= FRICTION;
+        if (i % 5 === 0) pts.push({x:sx,y:sy});
+        if (Math.hypot(svx,svy) < 0.5) break;
+        if (sx<0||sx>canvas.width||sy<0) break;
+      }
+      return pts;
+    }
+
+    function drawTrajectory() {
+      const traj = getTrajectoryPoints();
+      ctx.fillStyle = 'rgba(0,255,0,0.7)';
+      traj.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 3, 0, Math.PI*2);
+        ctx.fill();
+      });
+    }
+
+    // 描画
+    function draw() {
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      // レーン
+      ctx.fillStyle = '#444';
+      ctx.fillRect(50,50,canvas.width-100,canvas.height-100);
+      // ピン
+      pins.forEach(pin => {
+        if (!pin.hit) {
+          ctx.beginPath();
+          ctx.arc(pin.x, pin.y, PIN_RADIUS, 0, Math.PI*2);
+          ctx.fillStyle = '#ddd';
+          ctx.fill();
+        }
+      });
+      // 予測軌道
+      if (aiming) drawTrajectory();
+      // ボール
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, BALL_RADIUS, 0, Math.PI*2);
+      ctx.fillStyle = '#fff155';
+      ctx.fill();
+      // 照準線
+      if (aiming) {
+        ctx.strokeStyle = '#0f0';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(ball.x, ball.y);
+        ctx.lineTo(
+          ball.x + Math.cos(angle)*50,
+          ball.y + Math.sin(angle)*50
+        );
+        ctx.stroke();
+      }
+    }
+
+    // UI更新（角度・パワー）
+    function updateUI() {
+      angleEl.textContent = Math.round((angle*180/Math.PI+360)%360) + '°';
+      powerEl.textContent = power;
+    }
+
+    // メインループ
+    function loop() {
+      update();
+      draw();
+      updateUI();
+      requestAnimationFrame(loop);
+    }
+
+    // 初期化
+    document.addEventListener('keydown', handleKey);
+    startGame();
+    loop();
+  </script>
+</body>
+</html>
