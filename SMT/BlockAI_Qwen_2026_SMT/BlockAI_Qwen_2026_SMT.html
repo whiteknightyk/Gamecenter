@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <!-- スマートフォンでの表示調整 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JS Block Breaker (Mobile)</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #222;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: white;
+            overflow: hidden; /* スクロール防止 */
+            touch-action: none; /* ドラッグ操作をブラウザにさせない */
+        }
+
+        .game-container {
+            position: relative;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 800px; /* 最大幅を設定し、それ以上は縮小 */
+            aspect-ratio: 4/3; /* アスペクト比を維持 */
+        }
+
+        canvas {
+            background-color: #eee;
+            display: block;
+            width: 100%; /* 親要素の幅一杯に広がる */
+            height: auto; /* 縦は比率に合わせて自動調整 */
+            border-radius: 4px;
+        }
+
+        .ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #startScreen, #gameOverScreen {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            pointer-events: auto;
+            width: 80%;
+            box-sizing: border-box;
+        }
+
+        h1 { 
+            margin-top: 0; 
+            font-size: 2.5rem; 
+            color: #ffcc00;
+            text-shadow: 2px 2px 0px #333;
+        }
+        
+        p { 
+            font-size: 1.2rem; 
+            line-height: 1.6; 
+            margin-bottom: 20px;
+        }
+
+        .key {
+            display: inline-block;
+            background: #444;
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            margin: 0 2px;
+        }
+        
+        /* スマホ用の操作説明追加 */
+        .touch-hint {
+            background-color: #333;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #ddd;
+            display: none; /* デスクトップでは隠すオプションも可 */
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .touch-hint { display: none; } /* PCなら隠す */
+        }
+        
+        @media (hover: none) and (pointer: coarse) {
+            .touch-hint { display: block; }
+        }
+
+        button {
+            background-color: #0095DD;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            color: white;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        button:active {
+            transform: scale(0.95);
+            background-color: #0077b3;
+        }
+        
+        .hidden { display: none !important; }
+        
+        #scoreBoard {
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            pointer-events: none;
+            text-shadow: 1px 1px 0px rgba(255,255,255,0.5);
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <!-- canvasの幅/高さ属性は論理サイズ、CSSで表示サイズを制御 -->
+    <canvas id="myCanvas" width="800" height="600"></canvas>
+    
+    <!-- スコア表示 -->
+    <div id="scoreBoard">Score: 0 | Lives: 3</div>
+
+    <!-- UIオーバーレイ -->
+    <div class="ui-layer">
+        <!-- スタート画面 -->
+        <div id="startScreen">
+            <h1>Block Breaker</h1>
+            <p>スマートフォンでは<br><strong>指で画面をタッチ・スワイプ</strong></p>
+            <p class="touch-hint">指を乗せた場所にパドルが移動します。</p>
+            <p>PCでは矢印キー（← →）で操作します。</p>
+            <button id="startBtn">ゲームを始める</button>
+        </div>
+
+        <!-- ゲームオーバー/クリア画面 -->
+        <div id="gameOverScreen" class="hidden">
+            <h1 id="resultTitle">Game Over</h1>
+            <p id="resultMessage">あなたのスコア: 0</p>
+            <button id="restartBtn">もう一度遊ぶ</button>
+        </div>
+    </div>
+</div>
+
+<script src="BlockAI_Qwen_2026_SMT_process.js"></script>
+
+</body>
+</html>
